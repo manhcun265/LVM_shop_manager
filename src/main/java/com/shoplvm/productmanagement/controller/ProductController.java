@@ -1,6 +1,7 @@
 package com.shoplvm.productmanagement.controller;
 
 import com.shoplvm.productmanagement.dto.request.ProductRequest;
+import com.shoplvm.productmanagement.dto.request.UpdateProductStatusRequest;
 import com.shoplvm.productmanagement.dto.response.ProductDetailResponse;
 import com.shoplvm.productmanagement.dto.response.ProductResponse;
 import com.shoplvm.productmanagement.service.ProductService;
@@ -12,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/products")
+@RequestMapping("/api/products")
 @RequiredArgsConstructor
 public class ProductController {
     private final ProductService productService;
@@ -70,5 +71,11 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
 
+
+    @PutMapping("/status")
+    public ResponseEntity<String> updateProductStatus(@RequestBody UpdateProductStatusRequest request) {
+        productService.updateProductStatus(request);
+        return ResponseEntity.ok("Cập nhật trạng thái sản phẩm thành công.");
+    }
 
 }

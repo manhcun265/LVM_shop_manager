@@ -20,6 +20,9 @@ public class Product {
 
     private BigDecimal price;
 
+    @Enumerated(EnumType.STRING)
+    private ProductStatus status;
+
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;

@@ -1,8 +1,9 @@
 package com.shoplvm.productmanagement.service.impl;
 
 import com.shoplvm.productmanagement.dto.request.ProductRequest;
+import com.shoplvm.productmanagement.dto.request.UpdateProductStatusRequest;
 import com.shoplvm.productmanagement.dto.response.ProductDetailResponse;
-import com.shoplvm.productmanagement.dto.response.ProductResponse;
+import com.shoplvm.productmanagement.entity.Category;
 import com.shoplvm.productmanagement.entity.*;
 import com.shoplvm.productmanagement.repository.*;
 import com.shoplvm.productmanagement.service.ProductService;
@@ -181,5 +182,34 @@ public class ProductServiceImpl implements ProductService {
         Page<Product> productPage = productRepository.findByCategoryId(categoryId, pageable);
         return productPage.map(this::convertToProductDetailResponse);
     }
+
+    /**
+     * update product status
+     *
+     * @param request
+     */
+    @Override
+    public void updateProductStatus(UpdateProductStatusRequest request) {
+        Product product = productRepository.findById(request.getProductId())
+                .orElseThrow(() -> new RuntimeException("Sản phẩm không tồn tại"));
+
+        User user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new RuntimeException("Người dùng không tồn tại"));
+
+        // Ghi log trước khi cập nhật
+        ProductStatusLog statusLog = new ProductStatusLog();
+        statusLog.setProduct(product);
+        statusLog.setUser(user);
+        statusLog.setStatus(request.getStatus().name());
+        statusLog.setLogDate(new Timestamp(System.currentTimeMillis()));
+        statusLogRepository.save(statusLog);
+
+        // Cập nhật trạng thái
+        product.setStatus(request.getStatus());
+        productRepository.save(product);
+
+        log.info("Đã cập nhật trạng thái sản phẩm productId={}, status={}", request.getProductId(), request.getStatus());
+    }
+
 
 }
