@@ -11,5 +11,4 @@ public class UpdateProductStatusRequest {
     Long productId;
     ProductStatus status;
     Long userId;
-
 }
