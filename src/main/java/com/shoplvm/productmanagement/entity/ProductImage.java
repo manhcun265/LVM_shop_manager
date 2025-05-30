@@ -7,13 +7,13 @@ import lombok.Data;
 @Table(name = "product_images")
 @Data
 public class ProductImage {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    private String imageUrl;
+  private String imageUrl;
 
-    @ManyToOne
-    @JoinColumn(name = "product_id")
-    private Product product;
+  @ManyToOne
+  @JoinColumn(name = "product_id")
+  private Product product;
 }
