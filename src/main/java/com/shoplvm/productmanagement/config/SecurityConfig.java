@@ -16,8 +16,13 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                        // Auth endpoints - public
                         .requestMatchers("/api/auth/**").permitAll()
+                        // User management - admin only
+                        .requestMatchers("/api/users/**").hasRole("ADMIN")
+                        // Admin endpoints
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        // Other endpoints require authentication
                         .anyRequest().authenticated()
                 )
                 .formLogin(withDefaults());

@@ -1,13 +1,21 @@
 package com.shoplvm.productmanagement.service;
 
-import com.shoplvm.productmanagement.dto.request.LoginRequest;
-import com.shoplvm.productmanagement.dto.request.RegisterRequest;
+import com.shoplvm.productmanagement.dto.request.UpdateUserRequest;
 import com.shoplvm.productmanagement.dto.response.UserResponse;
+import org.springframework.data.domain.Page;
+
+import java.util.List;
 
 public interface UserService {
-    UserResponse register(RegisterRequest request);
+    List<UserResponse> getAllUsers();
 
-    UserResponse login(LoginRequest request);
+    Page<UserResponse> getUsersWithPagination(int page, int size);
 
-    void logout();
+    UserResponse getUserById(Long id);
+
+    UserResponse updateUser(Long id, UpdateUserRequest request);
+
+    void deleteUser(Long id);
+
+    UserResponse updateUserRole(Long id, String role);
 }
