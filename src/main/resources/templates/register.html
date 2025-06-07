@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Đăng ký tài khoản</title>
+    <th:block th:include="fragments/baseLayout :: head"></th:block>
+</head>
+<body>
+    <div th:replace="fragments/baseLayout :: layout(~{::main})">
+        <main>
+            <div class="container mt-5">
+                <div class="row justify-content-center">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2 class="text-center mb-0">Đăng ký tài khoản</h2>
+                            </div>
+                            <div class="card-body">
+                                <form th:action="@{/register}" method="post">
+                                    <div class="form-group mb-3">
+                                        <label>Họ và tên</label>
+                                        <input type="text" class="form-control" name="fullName" required />
+                                    </div>
+                                    <div class="form-group mb-3">
+                                        <label>Email</label>
+                                        <input type="email" class="form-control" name="email" required />
+                                    </div>
+                                    <div class="form-group mb-3">
+                                        <label>Tên đăng nhập</label>
+                                        <input type="text" class="form-control" name="username" required />
+                                    </div>
+                                    <div class="form-group mb-3">
+                                        <label>Mật khẩu</label>
+                                        <input type="password" class="form-control" name="password" required />
+                                    </div>
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-success">Đăng ký</button>
+                                    </div>
+                                    <div class="text-center mt-3">
+                                        <p>Đã có tài khoản? <a th:href="@{/login}">Đăng nhập ngay</a></p>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

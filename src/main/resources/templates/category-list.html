@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Danh sách danh mục</title>
+    <th:block th:include="fragments/baseLayout :: head"></th:block>
+</head>
+<body>
+    <div th:replace="fragments/baseLayout :: layout(~{::main})">
+        <main>
+            <div class="container mt-5">
+                <h2>Danh sách danh mục</h2>
+                <a th:href="@{/categories/new}" class="btn btn-success mb-3">Thêm danh mục</a>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Tên</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="category : ${categories}">
+                        <td th:text="${category.id}"></td>
+                        <td th:text="${category.name}"></td>
+                        <td>
+                            <a th:href="@{/categories/edit/{id}(id=${category.id})}" class="btn btn-primary btn-sm">Sửa</a>
+                            <a th:href="@{/categories/delete/{id}(id=${category.id})}" class="btn btn-danger btn-sm"
+                               onclick="return confirm('Xác nhận xóa?')">Xóa</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

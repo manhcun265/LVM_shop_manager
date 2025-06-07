@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Quản lý danh mục</title>
+    <th:block th:include="fragments/baseLayout :: head"></th:block>
+</head>
+<body>
+<div th:replace="fragments/baseLayout :: layout(~{::main})">
+    <main>
+        <div class="container mt-5">
+            <h2 th:if="${category.id != null}">Cập nhật danh mục</h2>
+            <h2 th:unless="${category.id != null}">Thêm danh mục mới</h2>
+            <form th:action="@{/categories/save}" method="post">
+                <input type="hidden" name="id" th:value="${category.id}"/>
+                <div class="form-group mb-3">
+                    <label>Tên danh mục</label>
+                    <input type="text" class="form-control" name="name" th:value="${category.name}" required/>
+                </div>
+                <button type="submit" class="btn btn-primary">Lưu</button>
+                <a th:href="@{/categories}" class="btn btn-secondary">Quay lại</a>
+            </form>
+        </div>
+    </main>
+</div>
+</body>
+</html>

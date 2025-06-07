@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Danh sách sản phẩm</title>
+    <th:block th:include="fragments/baseLayout :: head"></th:block>
+</head>
+<body>
+    <div th:replace="fragments/baseLayout :: layout(~{::main})">
+        <main>
+            <div class="container mt-5">
+                <h2>Danh sách sản phẩm</h2>
+                <a th:href="@{/products/new}" class="btn btn-success mb-3">Thêm sản phẩm</a>
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Tên</th>
+                            <th>Danh mục</th>
+                            <th>Giá</th>
+                            <th>Trạng thái</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="product : ${products}">
+                        <td th:text="${product.id}"></td>
+                        <td th:text="${product.name}"></td>
+                        <td th:text="${product.category?.name}"></td>
+                        <td th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + ' VND'"></td>
+                        <td>
+                            <span th:if="${product.status == 'ACTIVE'}" class="badge bg-success">Đang bán</span>
+                            <span th:if="${product.status == 'INACTIVE'}" class="badge bg-secondary">Ngừng bán</span>
+                        </td>
+                        <td>
+                            <a th:href="@{/products/edit/{id}(id=${product.id})}" class="btn btn-primary btn-sm">Sửa</a>
+                            <a th:href="@{/products/delete/{id}(id=${product.id})}" class="btn btn-danger btn-sm"
+                               onclick="return confirm('Bạn có chắc chắn muốn xóa?')">Xóa</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Danh sách người dùng</title>
+    <th:block th:include="fragments/baseLayout :: head"></th:block>
+</head>
+<body>
+    <div th:replace="fragments/baseLayout :: layout(~{::main})">
+        <main>
+            <div class="container mt-5">
+                <h2>Danh sách người dùng</h2>
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Họ tên</th>
+                            <th>Email</th>
+                            <th>Tên đăng nhập</th>
+                            <th>Quyền</th>
+                            <th>Trạng thái</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="user : ${users}">
+                        <td th:text="${user.id}"></td>
+                        <td th:text="${user.fullName}"></td>
+                        <td th:text="${user.email}"></td>
+                        <td th:text="${user.username}"></td>
+                        <td>
+                            <span th:if="${user.role == 'ADMIN'}" class="badge bg-danger">Quản trị viên</span>
+                            <span th:if="${user.role == 'USER'}" class="badge bg-primary">Người dùng</span>
+                        </td>
+                        <td>
+                            <span th:if="${user.enabled}" class="badge bg-success">Hoạt động</span>
+                            <span th:unless="${user.enabled}" class="badge bg-secondary">Tạm khóa</span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
