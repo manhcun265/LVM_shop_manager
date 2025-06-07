@@ -1,17 +1,14 @@
-package com.shoplvm.productmanagement.dto.response;
+package com.shoplvm.productmanagement.dto.request;
 
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
 @Data
 @Builder
-@AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CategoryResponse {
-    Long id;
+public class CategoryRequest {
     String name;
     String description;
 }
