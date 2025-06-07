@@ -1,44 +1,215 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="vi">
 <head>
-    <title>Quản lý sản phẩm</title>
-    <th:block th:include="fragments/baseLayout :: head"></th:block>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="formTitle">Quản lý sản phẩm</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <div th:replace="fragments/baseLayout :: layout(~{::main})">
-        <main>
-            <div class="container mt-5">
-                <h2 th:text="${product.id != null} ? 'Cập nhật sản phẩm' : 'Thêm sản phẩm mới'"></h2>
-                <form th:action="@{${product.id != null} ? '/products/update' : '/products/save'}" method="post">
-                    <input type="hidden" name="id" th:value="${product.id}" />
-                    <div class="form-group mb-3">
-                        <label>Tên sản phẩm</label>
-                        <input type="text" class="form-control" name="name" th:value="${product.name}" required />
-                    </div>
-                    <div class="form-group mb-3">
-                        <label>Giá</label>
-                        <input type="number" class="form-control" name="price" th:value="${product.price}" required />
-                    </div>
-                    <div class="form-group mb-3">
-                        <label>Danh mục</label>
-                        <select class="form-control" name="category.id" required>
-                            <option value="">-- Chọn danh mục --</option>
-                            <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}"
-                                    th:selected="${cat.id == product.category?.id}"></option>
-                        </select>
-                    </div>
-                    <div class="form-group mb-3">
-                        <label>Trạng thái</label>
-                        <select class="form-control" name="status">
-                            <option value="ACTIVE" th:selected="${product.status == 'ACTIVE'}">Đang bán</option>
-                            <option value="INACTIVE" th:selected="${product.status == 'INACTIVE'}">Ngừng bán</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Lưu</button>
-                    <a th:href="@{/products}" class="btn btn-secondary">Quay lại</a>
-                </form>
+    <div class="page-wrapper">
+        <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="index.html">Shop LVM</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link" href="product-list.html">Sản phẩm</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="category-list.html">Danh mục</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="user-list.html">Người dùng</a>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user-circle"></i> Tài khoản
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="#">Thông tin cá nhân</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="login.html">Đăng xuất</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
             </div>
-        </main>
+        </nav>
+
+        <div class="main-content-wrapper">
+            <div class="sidebar">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><a href="product-list.html"><i class="fas fa-box me-2"></i> Sản phẩm</a></li>
+                    <li class="list-group-item"><a href="category-list.html"><i class="fas fa-tags me-2"></i> Danh mục</a></li>
+                    <li class="list-group-item"><a href="user-list.html"><i class="fas fa-users me-2"></i> Người dùng</a></li>
+                </ul>
+            </div>
+            <div class="content-area">
+                <div class="container mt-5">
+                    <h2 id="pageHeading"></h2>
+                    <form id="productForm">
+                        <input type="hidden" id="productId" />
+                        <div class="form-group mb-3">
+                            <label for="productName">Tên sản phẩm</label>
+                            <input type="text" class="form-control" id="productName" required />
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="productPrice">Giá</label>
+                            <input type="number" class="form-control" id="productPrice" required />
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="productCategory">Danh mục</label>
+                            <select class="form-control" id="productCategory" required>
+                                <option value="">-- Chọn danh mục --</option>
+                                </select>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="productStatus">Trạng thái</label>
+                            <select class="form-control" id="productStatus">
+                                <option value="ACTIVE">Đang bán</option>
+                                <option value="INACTIVE">Ngừng bán</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Lưu</button>
+                        <a href="product-list.html" class="btn btn-secondary">Quay lại</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer mt-auto py-3 bg-light">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Shop LVM</h5>
+                        <p class="mb-0">Hệ thống quản lý sản phẩm hiện đại và dễ sử dụng.</p>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <p class="mb-0">© 2024 Shop LVM. All rights reserved.</p>
+                        <small class="text-muted">Version 1.0.0</small>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="js/main.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            const productForm = document.getElementById('productForm');
+            const productIdInput = document.getElementById('productId');
+            const productNameInput = document.getElementById('productName');
+            const productPriceInput = document.getElementById('productPrice');
+            const productCategorySelect = document.getElementById('productCategory');
+            const productStatusSelect = document.getElementById('productStatus');
+            const pageHeading = document.getElementById('pageHeading');
+            const formTitle = document.getElementById('formTitle');
+
+            // Lấy ID sản phẩm từ URL parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = urlParams.get('id');
+
+            // Hàm tải danh mục vào dropdown
+            async function loadCategoriesIntoDropdown() {
+                try {
+                    const categories = await callApi('/categories', 'GET');
+                    productCategorySelect.innerHTML = '<option value="">-- Chọn danh mục --</option>'; // Xóa và thêm mặc định
+                    categories.forEach(category => {
+                        const option = document.createElement('option');
+                        option.value = category.id;
+                        option.textContent = category.name;
+                        productCategorySelect.appendChild(option);
+                    });
+                } catch (error) {
+                    console.error('Lỗi khi tải danh mục cho dropdown:', error);
+                    alert('Không thể tải danh mục. Vui lòng thử lại.');
+                }
+            }
+
+            await loadCategoriesIntoDropdown(); // Tải danh mục trước khi điền dữ liệu sản phẩm
+
+            if (productId) {
+                pageHeading.textContent = 'Cập nhật sản phẩm';
+                formTitle.textContent = 'Cập nhật sản phẩm';
+                try {
+                    const product = await callApi(`/products/${productId}`, 'GET');
+                    if (product) {
+                        productIdInput.value = product.id;
+                        productNameInput.value = product.name;
+                        productPriceInput.value = product.price;
+                        productCategorySelect.value = product.category ? product.category.id : ''; // Chọn danh mục đã có
+                        productStatusSelect.value = product.status || 'ACTIVE'; // Mặc định là ACTIVE nếu không có trạng thái
+                    } else {
+                        alert('Không tìm thấy sản phẩm!');
+                        window.location.href = 'product-list.html';
+                    }
+                } catch (error) {
+                    console.error('Lỗi khi tải sản phẩm để sửa:', error);
+                    alert('Không thể tải thông tin sản phẩm. Vui lòng thử lại.');
+                    window.location.href = 'product-list.html';
+                }
+            } else {
+                pageHeading.textContent = 'Thêm sản phẩm mới';
+                formTitle.textContent = 'Thêm sản phẩm mới';
+            }
+
+            productForm.addEventListener('submit', async function(event) {
+                event.preventDefault();
+
+                const id = productIdInput.value || null;
+                const name = productNameInput.value.trim();
+                const price = parseFloat(productPriceInput.value);
+                const categoryId = productCategorySelect.value;
+                const status = productStatusSelect.value;
+
+                if (!name || isNaN(price) || price <= 0 || !categoryId) {
+                    alert('Vui lòng điền đầy đủ và đúng thông tin sản phẩm (Tên, Giá > 0, Danh mục).');
+                    return;
+                }
+
+                const productData = {
+                    name: name,
+                    price: price,
+                    category: { id: parseInt(categoryId) }, // Đảm bảo gửi ID danh mục là số
+                    status: status
+                };
+
+                let url = '/products';
+                let method = id ? 'PUT' : 'POST';
+
+                try {
+                    const result = await callApi(url + (id ? `/${id}` : ''), method, productData);
+                    if (result) {
+                        alert(id ? 'Sản phẩm đã được cập nhật thành công!' : 'Sản phẩm đã được thêm thành công!');
+                        window.location.href = 'product-list.html';
+                    }
+                } catch (error) {
+                    console.error("Lưu sản phẩm thất bại:", error);
+                    // Lỗi đã được alert bởi callApi
+                }
+            });
+        });
+    </script>
+
+    <div id="loadingOverlay" class="position-fixed top-0 start-0 w-100 h-100 d-none" 
+         style="background: rgba(0,0,0,0.5); z-index: 9999;">
+        <div class="d-flex justify-content-center align-items-center h-100">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
     </div>
 </body>
 </html>
