@@ -1,18 +1,20 @@
 package com.shoplvm.productmanagement.dto.response;
 
-import lombok.Data;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserResponse {
-    private Long id;
-    private String username;
-    private String email;
-    private String role;
+    Long id;
+    String username;
+    String email;
+    String role;
+    String message;
 
     public UserResponse(Long id, String username, String email, String role) {
-        this.id = id;
-        this.username = username;
-        this.email = email;
-        this.role = role;
     }
 }

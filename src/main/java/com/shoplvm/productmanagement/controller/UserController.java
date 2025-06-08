@@ -3,14 +3,16 @@ package com.shoplvm.productmanagement.controller;
 import com.shoplvm.productmanagement.dto.request.UpdateUserRequest;
 import com.shoplvm.productmanagement.dto.response.UserResponse;
 import com.shoplvm.productmanagement.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
+/**
+ * Controller xử lý các yêu cầu liên quan đến người dùng
+ */
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
@@ -18,41 +20,57 @@ public class UserController {
 
     private final UserService userService;
 
+    /**
+     * Lấy danh sách tất cả người dùng
+     */
     @GetMapping
     public ResponseEntity<List<UserResponse>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
-    @GetMapping("/page")
-    public ResponseEntity<Page<UserResponse>> getUsersWithPagination(
-            @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "size", defaultValue = "10") int size) {
-        return ResponseEntity.ok(userService.getUsersWithPagination(page, size));
-    }
-
+    /**
+     * Lấy thông tin chi tiết người dùng theo ID
+     */
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getUserById(id));
     }
 
+    /**
+     * Cập nhật thông tin người dùng
+     */
     @PutMapping("/{id}")
     public ResponseEntity<UserResponse> updateUser(
-            @PathVariable Long id,
-            @RequestBody UpdateUserRequest request) {
-        return ResponseEntity.ok(userService.updateUser(id, request));
+            @PathVariable Long id, @Valid @RequestBody UpdateUserRequest dto) {
+       userService.updateUser(id, dto);
+        return ResponseEntity.ok(UserResponse.builder()
+                .message("Cập nhật thông tin người dùng thành công")
+                .id(id)
+                .build());
     }
 
+    /**
+     * Xóa người dùng
+     */
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<UserResponse> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
-        return ResponseEntity.ok("User deleted successfully");
+        return ResponseEntity.ok(UserResponse.builder()
+                .message("Xóa người dùng thành công")
+                .id(id)
+                .build());
     }
 
+    /**
+     * Cập nhật vai trò người dùng
+     */
     @PutMapping("/{id}/role")
     public ResponseEntity<UserResponse> updateUserRole(
-            @PathVariable Long id,
-            @RequestBody Map<String, String> roleRequest) {
-        String role = roleRequest.get("role");
-        return ResponseEntity.ok(userService.updateUserRole(id, role));
+            @PathVariable Long id, @Valid @RequestBody String role) {
+        userService.updateUserRole(id, role);
+        return ResponseEntity.ok(UserResponse.builder()
+                .message("Cập nhật vai trò người dùng thành công")
+                .id(id)
+                .build());
     }
 }

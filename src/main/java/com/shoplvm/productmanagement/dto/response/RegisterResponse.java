@@ -6,13 +6,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * DTO chứa thông tin về danh mục sản phẩm
+ * DTO chứa thông tin phản hồi khi đăng ký thành công
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CategoryResponse {
-    private Long id;
+public class RegisterResponse {
+    private Long userId;
+    private String username;
+    private String email;
     private String message;
-}
+} 

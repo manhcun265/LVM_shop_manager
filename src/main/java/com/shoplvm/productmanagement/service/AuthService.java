@@ -2,12 +2,13 @@ package com.shoplvm.productmanagement.service;
 
 import com.shoplvm.productmanagement.dto.request.LoginRequest;
 import com.shoplvm.productmanagement.dto.request.RegisterRequest;
-import com.shoplvm.productmanagement.dto.response.UserResponse;
+import com.shoplvm.productmanagement.dto.response.LoginResponse;
+import com.shoplvm.productmanagement.dto.response.RegisterResponse;
 
 public interface AuthService {
-    UserResponse register(RegisterRequest request);
+    RegisterResponse register(RegisterRequest request);
 
-    UserResponse login(LoginRequest request);
+    LoginResponse login(LoginRequest request);
 
-    void logout();
+    void logout(String token);
 }

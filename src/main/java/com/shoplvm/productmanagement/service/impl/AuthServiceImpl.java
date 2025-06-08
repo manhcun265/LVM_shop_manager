@@ -2,9 +2,10 @@ package com.shoplvm.productmanagement.service.impl;
 
 import com.shoplvm.productmanagement.dto.request.LoginRequest;
 import com.shoplvm.productmanagement.dto.request.RegisterRequest;
-import com.shoplvm.productmanagement.dto.response.UserResponse;
+import com.shoplvm.productmanagement.dto.response.LoginResponse;
+import com.shoplvm.productmanagement.dto.response.RegisterResponse;
 import com.shoplvm.productmanagement.entity.User;
-import com.shoplvm.productmanagement.repository.AuthRepository;
+import com.shoplvm.productmanagement.repository.UserRepository;
 import com.shoplvm.productmanagement.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,62 +13,84 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
-import java.time.Instant;
 
+/**
+ * Service implementation xử lý logic nghiệp vụ liên quan đến xác thực
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class AuthServiceImpl implements AuthService {
 
-    private final AuthRepository authRepository;
+    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    /**
+     * Đăng ký tài khoản mới
+     *
+     * @return
+     */
     @Override
-    public UserResponse register(RegisterRequest request) {
-        log.info("Attempting to register user with email: {}", request.getEmail());
-
-        if (authRepository.existsByEmail(request.getEmail())) {
-            log.warn("Registration failed. Email already exists: {}", request.getEmail());
-            throw new RuntimeException("Email already in use");
+    public RegisterResponse register(RegisterRequest request) {
+        // Kiểm tra username đã tồn tại
+        if (userRepository.existsByUsername(request.getUsername())) {
+            throw new RuntimeException("Tên đăng nhập đã tồn tại");
         }
 
+        // Kiểm tra email đã tồn tại
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new RuntimeException("Email đã tồn tại");
+        }
+
+        // Tạo user mới
         User user = new User();
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
         user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         user.setRole("USER");
-        user.setCreatedAt(Timestamp.from(Instant.now()));
-        authRepository.save(user);
+        user.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+        userRepository.save(user);
 
-        log.info("User registered successfully with ID: {}", user.getId());
-        return toUserResponse(user);
+        log.info("Đăng ký tài khoản thành công, username={}", request.getUsername());
+        return null;
     }
 
+    /**
+     * Đăng nhập
+     *
+     * @return
+     */
     @Override
-    public UserResponse login(LoginRequest request) {
-        log.info("User login attempt with email: {}", request.getEmail());
+    public LoginResponse login(LoginRequest request) {
+        try {
+            // Tìm user theo email
+            User user = userRepository.findByEmail(request.getEmail())
+                    .orElseThrow(() -> new RuntimeException("Email hoặc mật khẩu không đúng"));
 
-        User user = authRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> {
-                    log.warn("Login failed. Email not found: {}", request.getEmail());
-                    return new RuntimeException("Invalid email or password");
-                });
+            // Kiểm tra mật khẩu
+            if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
+                throw new RuntimeException("Email hoặc mật khẩu không đúng");
+            }
 
-        if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
-            log.warn("Login failed. Incorrect password for email: {}", request.getEmail());
-            throw new RuntimeException("Invalid email or password");
+            log.info("Đăng nhập thành công, email={}", request.getEmail());
+        } catch (Exception e) {
+            log.error("Đăng nhập thất bại, email={}, error={}", request.getEmail(), e.getMessage());
+            throw new RuntimeException("Email hoặc mật khẩu không đúng");
         }
+        // Trả về thông tin đăng nhập thành công
+        LoginResponse response = new LoginResponse();
+        response.setMessage("Đăng nhập thành công");
+        response.setToken("mock-jwt-token"); // Giả lập token JWT
+        log.info("Trả về thông tin đăng nhập thành công: {}", response);
 
-        log.info("User logged in successfully: {}", user.getId());
-        return toUserResponse(user);
+        return response;
     }
 
+    /**
+     * Đăng xuất
+     */
     @Override
-    public void logout() {
-        log.info("User logged out.");
-    }
-
-    private UserResponse toUserResponse(User user) {
-        return new UserResponse(user.getId(), user.getUsername(), user.getEmail(), user.getRole());
+    public void logout(String token) {
+        log.info("Đăng xuất thành công");
     }
 }

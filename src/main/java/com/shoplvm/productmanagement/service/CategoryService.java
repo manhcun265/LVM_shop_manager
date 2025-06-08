@@ -6,9 +6,9 @@ import com.shoplvm.productmanagement.dto.response.CategoryResponse;
 import java.util.List;
 
 public interface CategoryService {
-    CategoryResponse create(CategoryRequest request);
+    Long create(CategoryRequest request);
 
-    CategoryResponse update(Long id, CategoryRequest request);
+    void update(Long id, CategoryRequest request);
 
     void delete(Long id);
 

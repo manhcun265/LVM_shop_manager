@@ -13,9 +13,9 @@ public interface UserService {
 
     UserResponse getUserById(Long id);
 
-    UserResponse updateUser(Long id, UpdateUserRequest request);
+    void updateUser(Long id, UpdateUserRequest request);
 
     void deleteUser(Long id);
 
-    UserResponse updateUserRole(Long id, String role);
+    void updateUserRole(Long id, String role);
 }

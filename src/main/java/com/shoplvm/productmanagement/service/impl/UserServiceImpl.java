@@ -10,103 +10,123 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Service implementation xử lý logic nghiệp vụ liên quan đến người dùng
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
 
+    /**
+     * Lấy danh sách tất cả người dùng
+     */
     @Override
     public List<UserResponse> getAllUsers() {
-        log.info("Getting all users");
         return userRepository.findAll().stream()
                 .map(this::toUserResponse)
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Lấy danh sách người dùng có phân trang
+     */
     @Override
     public Page<UserResponse> getUsersWithPagination(int page, int size) {
-        log.info("Getting users with pagination - page: {}, size: {}", page, size);
         Pageable pageable = PageRequest.of(page, size);
         return userRepository.findAll(pageable)
                 .map(this::toUserResponse);
     }
 
+    /**
+     * Lấy thông tin chi tiết người dùng theo ID
+     */
     @Override
     public UserResponse getUserById(Long id) {
-        log.info("Getting user by id: {}", id);
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Người dùng không tồn tại"));
         return toUserResponse(user);
     }
 
+    /**
+     * Cập nhật thông tin người dùng
+     *
+     * @return
+     */
     @Override
-    public UserResponse updateUser(Long id, UpdateUserRequest request) {
-        log.info("Updating user with id: {}", id);
-
+    @Transactional
+    public void updateUser(Long id, UpdateUserRequest request) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Người dùng không tồn tại"));
 
-        // Kiểm tra email trùng lặp nếu email được thay đổi
-        if (request.getEmail() != null && !request.getEmail().equals(user.getEmail())) {
-            if (userRepository.existsByEmail(request.getEmail())) {
-                throw new RuntimeException("Email already in use");
-            }
-            user.setEmail(request.getEmail());
+        // Kiểm tra username đã tồn tại
+        if (!user.getUsername().equals(request.getUsername()) 
+                && userRepository.existsByUsername(request.getUsername())) {
+            throw new IllegalArgumentException("Tên đăng nhập đã tồn tại");
         }
 
-        if (request.getUsername() != null) {
-            user.setUsername(request.getUsername());
+        // Kiểm tra email đã tồn tại
+        if (!user.getEmail().equals(request.getEmail()) 
+                && userRepository.existsByEmail(request.getEmail())) {
+            throw new IllegalArgumentException("Email đã tồn tại");
         }
 
-        if (request.getPassword() != null && !request.getPassword().trim().isEmpty()) {
-            user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
-        }
-
-        User savedUser = userRepository.save(user);
-        log.info("User updated successfully with id: {}", id);
-        return toUserResponse(savedUser);
+        user.setUsername(request.getUsername());
+        user.setEmail(request.getEmail());
+        userRepository.save(user);
+        log.info("Cập nhật thông tin người dùng thành công, userId={}", id);
     }
 
+    /**
+     * Xóa người dùng
+     */
     @Override
+    @Transactional
     public void deleteUser(Long id) {
-        log.info("Deleting user with id: {}", id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Người dùng không tồn tại"));
 
-        if (!userRepository.existsById(id)) {
-            throw new RuntimeException("User not found with id: " + id);
+        // Không cho phép xóa tài khoản admin
+        if (user.getRole().equals("ADMIN")) {
+            throw new IllegalArgumentException("Không thể xóa tài khoản admin");
         }
 
         userRepository.deleteById(id);
-        log.info("User deleted successfully with id: {}", id);
+        log.info("Xóa người dùng thành công, userId={}", id);
     }
 
     @Override
-    public UserResponse updateUserRole(Long id, String role) {
-        log.info("Updating user role - id: {}, role: {}", id, role);
-
+    public void updateUserRole(Long id, String role) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Người dùng không tồn tại"));
 
-        // Validate role
+        // Kiểm tra role hợp lệ
         if (!role.equals("USER") && !role.equals("ADMIN")) {
-            throw new RuntimeException("Invalid role. Must be USER or ADMIN");
+            throw new IllegalArgumentException("Vai trò không hợp lệ");
         }
 
         user.setRole(role);
-        User savedUser = userRepository.save(user);
-        log.info("User role updated successfully - id: {}, new role: {}", id, role);
-        return toUserResponse(savedUser);
+        userRepository.save(user);
+        log.info("Cập nhật vai trò người dùng thành công, userId={}, role={}", id, role);
     }
 
+    /**
+     * Chuyển đổi từ User entity sang UserResponse
+     */
     private UserResponse toUserResponse(User user) {
-        return new UserResponse(user.getId(), user.getUsername(), user.getEmail(), user.getRole());
+        return UserResponse.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .role(user.getRole())
+                .build();
     }
 }
