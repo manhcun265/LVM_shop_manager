@@ -7,6 +7,7 @@ import com.shoplvm.productmanagement.dto.response.RegisterResponse;
 import com.shoplvm.productmanagement.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
+@Slf4j
 public class AuthController {
 
     private final AuthService authService;
@@ -26,12 +28,9 @@ public class AuthController {
      */
     @PostMapping("/register")
     public ResponseEntity<RegisterResponse> register(@Valid @RequestBody RegisterRequest request) {
-        RegisterResponse register = authService.register(request);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(RegisterResponse.builder()
-                        .message("Đăng ký tài khoản thành công")
-                        .userId(register.getUserId())
-                        .build());
+        log.info("Nhận yêu cầu đăng ký từ username={}, email={}", request.getUsername(), request.getEmail());
+        RegisterResponse response = authService.register(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     /**
@@ -39,19 +38,18 @@ public class AuthController {
      */
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
-        LoginResponse login = authService.login(request);
-        return ResponseEntity.ok(LoginResponse.builder()
-                .message("Đăng nhập thành công")
-                .token(login.getToken())
-                .build());
+        log.info("Nhận yêu cầu đăng nhập từ email={}", request.getEmail());
+        LoginResponse response = authService.login(request);
+        return ResponseEntity.ok(response);
     }
 
     /**
      * Đăng xuất
      */
     @PostMapping("/logout")
-    public ResponseEntity<LoginResponse> logout(@RequestHeader("Authorization") String token) {
-        authService.logout(token);
+    public ResponseEntity<LoginResponse> logout() {
+        log.info("Nhận yêu cầu đăng xuất");
+        authService.logout();
         return ResponseEntity.ok(LoginResponse.builder()
                 .message("Đăng xuất thành công")
                 .build());

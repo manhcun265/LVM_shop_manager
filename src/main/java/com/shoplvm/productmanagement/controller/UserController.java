@@ -1,6 +1,7 @@
 package com.shoplvm.productmanagement.controller;
 
 import com.shoplvm.productmanagement.dto.request.UpdateUserRequest;
+import com.shoplvm.productmanagement.dto.request.UpdateUserRoleRequest;
 import com.shoplvm.productmanagement.dto.response.UserResponse;
 import com.shoplvm.productmanagement.service.UserService;
 import jakarta.validation.Valid;
@@ -66,8 +67,8 @@ public class UserController {
      */
     @PutMapping("/{id}/role")
     public ResponseEntity<UserResponse> updateUserRole(
-            @PathVariable Long id, @Valid @RequestBody String role) {
-        userService.updateUserRole(id, role);
+            @PathVariable Long id, @Valid @RequestBody UpdateUserRoleRequest request) {
+        userService.updateUserRole(id, request.getRole());
         return ResponseEntity.ok(UserResponse.builder()
                 .message("Cập nhật vai trò người dùng thành công")
                 .id(id)

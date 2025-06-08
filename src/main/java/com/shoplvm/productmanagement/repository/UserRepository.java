@@ -31,5 +31,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * Tìm người dùng theo tên đăng nhập
      */
 
-    Optional<Object> findByUsername(String username);
+    Optional<User> findByUsername(String username);
 }

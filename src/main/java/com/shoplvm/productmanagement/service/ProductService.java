@@ -17,4 +17,10 @@ public interface ProductService {
   Page<ProductDetailResponse> getProductsByCategory(Long categoryId, int page, int size);
 
   void updateProductStatus(UpdateProductStatusRequest request);
+
+  /**
+   * Lấy danh sách tất cả sản phẩm
+   */
+  Page<ProductDetailResponse> getAllProducts(int page, int size);
+
 }
