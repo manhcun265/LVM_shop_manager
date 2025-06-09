@@ -5,8 +5,8 @@ import com.shoplvm.productmanagement.dto.response.CategoryResponse;
 import com.shoplvm.productmanagement.service.CategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,6 +17,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/categories")
 @RequiredArgsConstructor
+@Slf4j
 public class CategoryController {
     private final CategoryService categoryService;
 
@@ -24,55 +25,60 @@ public class CategoryController {
      * Tạo mới danh mục
      */
     @PostMapping
-    public ResponseEntity<CategoryResponse> create(@Valid @RequestBody CategoryRequest request) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public CategoryResponse create(@Valid @RequestBody CategoryRequest request) {
+        log.info("Nhận yêu cầu tạo danh mục mới: {}", request.getName());
         Long id = categoryService.create(request);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(CategoryResponse.builder()
-                        .message("Thêm danh mục thành công")
-                        .id(id)
-                        .build());
+        return CategoryResponse.builder()
+                .message("Thêm danh mục thành công")
+                .id(id)
+                .build();
     }
 
     /**
      * Cập nhật thông tin danh mục
      */
     @PutMapping("/{id}")
-    public ResponseEntity<CategoryResponse> update(
+    @ResponseStatus(HttpStatus.OK)
+    public CategoryResponse update(
             @PathVariable Long id,
             @Valid @RequestBody CategoryRequest request) {
+        log.info("Nhận yêu cầu cập nhật danh mục ID={}", id);
         categoryService.update(id, request);
-        return ResponseEntity.ok(CategoryResponse.builder()
+        return CategoryResponse.builder()
                 .message("Cập nhật danh mục thành công")
                 .id(id)
-                .build());
+                .build();
     }
 
     /**
      * Xóa danh mục
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<CategoryResponse> delete(@PathVariable Long id) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long id) {
+        log.info("Nhận yêu cầu xóa danh mục ID={}", id);
         categoryService.delete(id);
-        return ResponseEntity.ok(CategoryResponse.builder()
-                .message("Xóa danh mục thành công")
-                .id(id)
-                .build());
     }
 
     /**
      * Lấy danh sách tất cả danh mục
      */
     @GetMapping
-    public ResponseEntity<List<CategoryResponse>> findAll() {
-        return ResponseEntity.ok(categoryService.findAll());
+    @ResponseStatus(HttpStatus.OK)
+    public List<CategoryResponse> findAll() {
+        log.info("Lấy danh sách tất cả danh mục");
+        return categoryService.findAll();
     }
 
     /**
      * Lấy thông tin chi tiết danh mục theo ID
      */
     @GetMapping("/{id}")
-    public ResponseEntity<CategoryResponse> findById(@PathVariable Long id) {
-        return ResponseEntity.ok(categoryService.findById(id));
+    @ResponseStatus(HttpStatus.OK)
+    public CategoryResponse findById(@PathVariable Long id) {
+        log.info("Lấy thông tin chi tiết danh mục ID={}", id);
+        return categoryService.findById(id);
     }
 }
 

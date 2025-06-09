@@ -28,6 +28,9 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Lấy danh sách tất cả người dùng
+     * Chuyển đổi từ danh sách User entity sang danh sách UserResponse
+     * 
+     * @return List<UserResponse> Danh sách thông tin người dùng
      */
     @Override
     public List<UserResponse> getAllUsers() {
@@ -38,6 +41,10 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Lấy danh sách người dùng có phân trang
+     * 
+     * @param page Số trang (bắt đầu từ 0)
+     * @param size Số lượng phần tử trên mỗi trang
+     * @return Page<UserResponse> Trang dữ liệu chứa thông tin người dùng
      */
     @Override
     public Page<UserResponse> getUsersWithPagination(int page, int size) {
@@ -48,6 +55,10 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Lấy thông tin chi tiết người dùng theo ID
+     * 
+     * @param id ID của người dùng cần lấy thông tin
+     * @return UserResponse Thông tin chi tiết người dùng
+     * @throws IllegalArgumentException Nếu không tìm thấy người dùng
      */
     @Override
     public UserResponse getUserById(Long id) {
@@ -58,8 +69,11 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Cập nhật thông tin người dùng
-     *
-     * @return
+     * Kiểm tra username và email có bị trùng không trước khi cập nhật
+     * 
+     * @param id ID của người dùng cần cập nhật
+     * @param request Thông tin cập nhật mới
+     * @throws IllegalArgumentException Nếu không tìm thấy người dùng hoặc thông tin bị trùng
      */
     @Override
     @Transactional
@@ -87,6 +101,10 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Xóa người dùng
+     * Không cho phép xóa tài khoản admin
+     * 
+     * @param id ID của người dùng cần xóa
+     * @throws IllegalArgumentException Nếu không tìm thấy người dùng hoặc là tài khoản admin
      */
     @Override
     @Transactional
@@ -103,6 +121,14 @@ public class UserServiceImpl implements UserService {
         log.info("Xóa người dùng thành công, userId={}", id);
     }
 
+    /**
+     * Cập nhật vai trò người dùng
+     * Chỉ cho phép cập nhật thành USER hoặc ADMIN
+     * 
+     * @param id ID của người dùng cần cập nhật vai trò
+     * @param role Vai trò mới (USER/ADMIN)
+     * @throws IllegalArgumentException Nếu không tìm thấy người dùng hoặc vai trò không hợp lệ
+     */
     @Override
     public void updateUserRole(Long id, String role) {
         User user = userRepository.findById(id)
@@ -120,13 +146,22 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Chuyển đổi từ User entity sang UserResponse
+     * 
+     * @param user Entity User chứa thông tin người dùng từ database
+     * @return UserResponse chứa thông tin người dùng đã được chuyển đổi
+     *         - id: ID của người dùng
+     *         - username: Tên đăng nhập
+     *         - email: Địa chỉ email
+     *         - role: Vai trò (USER/ADMIN)
+     *         - message: Thông báo kết quả thao tác
      */
     private UserResponse toUserResponse(User user) {
         return UserResponse.builder()
-                .id(user.getId())
-                .username(user.getUsername())
-                .email(user.getEmail())
-                .role(user.getRole())
+                .id(user.getId())           // Lấy ID từ entity User
+                .username(user.getUsername()) // Lấy tên đăng nhập
+                .email(user.getEmail())     // Lấy địa chỉ email
+                .role(user.getRole())       // Lấy vai trò người dùng
+                .message("Thao tác thành công") // Thêm thông báo mặc định
                 .build();
     }
 }

@@ -14,7 +14,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Service implementation xử lý logic nghiệp vụ liên quan đến danh mục
+ * Service implementation xử lý logic nghiệp vụ liên quan đến danh mục sản phẩm
+ * Bao gồm các chức năng:
+ * - Tạo mới danh mục
+ * - Cập nhật thông tin danh mục
+ * - Xóa danh mục
+ * - Lấy danh sách danh mục
+ * - Lấy thông tin chi tiết danh mục
  */
 @Service
 @RequiredArgsConstructor
@@ -25,6 +31,9 @@ public class CategoryServiceImpl implements CategoryService {
 
     /**
      * Lấy danh sách tất cả danh mục
+     * Chuyển đổi từ danh sách Category entity sang danh sách CategoryResponse
+     * 
+     * @return List<CategoryResponse> Danh sách thông tin danh mục
      */
     @Override
     public List<CategoryResponse> findAll() {
@@ -35,6 +44,10 @@ public class CategoryServiceImpl implements CategoryService {
 
     /**
      * Lấy thông tin chi tiết danh mục theo ID
+     * 
+     * @param id ID của danh mục cần lấy thông tin
+     * @return CategoryResponse Thông tin chi tiết danh mục
+     * @throws IllegalArgumentException Nếu không tìm thấy danh mục
      */
     @Override
     public CategoryResponse findById(Long id) {
@@ -45,8 +58,9 @@ public class CategoryServiceImpl implements CategoryService {
 
     /**
      * Tạo mới danh mục
-     *
-     * @return
+     * 
+     * @param request Thông tin danh mục cần tạo
+     * @return Long ID của danh mục vừa tạo
      */
     @Override
     @Transactional
@@ -61,8 +75,10 @@ public class CategoryServiceImpl implements CategoryService {
 
     /**
      * Cập nhật thông tin danh mục
-     *
-     * @return
+     * 
+     * @param id ID của danh mục cần cập nhật
+     * @param request Thông tin cập nhật mới
+     * @throws IllegalArgumentException Nếu không tìm thấy danh mục
      */
     @Override
     @Transactional
@@ -76,9 +92,11 @@ public class CategoryServiceImpl implements CategoryService {
         log.info("Cập nhật danh mục thành công, categoryId={}", id);
     }
 
-
     /**
      * Xóa danh mục
+     * 
+     * @param id ID của danh mục cần xóa
+     * @throws IllegalArgumentException Nếu không tìm thấy danh mục
      */
     @Override
     @Transactional
@@ -92,12 +110,14 @@ public class CategoryServiceImpl implements CategoryService {
 
     /**
      * Chuyển đổi từ Category entity sang CategoryResponse
+     * 
+     * @param category Entity Category cần chuyển đổi
+     * @return CategoryResponse Chứa thông tin danh mục
      */
     private CategoryResponse toCategoryResponse(Category category) {
         return CategoryResponse.builder()
                 .id(category.getId())
                 .build();
     }
-
 }
 

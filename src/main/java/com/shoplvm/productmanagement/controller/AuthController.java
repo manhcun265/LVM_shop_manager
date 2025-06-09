@@ -9,7 +9,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -27,31 +26,29 @@ public class AuthController {
      * Đăng ký tài khoản mới
      */
     @PostMapping("/register")
-    public ResponseEntity<RegisterResponse> register(@Valid @RequestBody RegisterRequest request) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public RegisterResponse register(@Valid @RequestBody RegisterRequest request) {
         log.info("Nhận yêu cầu đăng ký từ username={}, email={}", request.getUsername(), request.getEmail());
-        RegisterResponse response = authService.register(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return authService.register(request);
     }
 
     /**
      * Đăng nhập
      */
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
+    @ResponseStatus(HttpStatus.OK)
+    public LoginResponse login(@Valid @RequestBody LoginRequest request) {
         log.info("Nhận yêu cầu đăng nhập từ email={}", request.getEmail());
-        LoginResponse response = authService.login(request);
-        return ResponseEntity.ok(response);
+        return authService.login(request);
     }
 
     /**
      * Đăng xuất
      */
     @PostMapping("/logout")
-    public ResponseEntity<LoginResponse> logout() {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void logout() {
         log.info("Nhận yêu cầu đăng xuất");
         authService.logout();
-        return ResponseEntity.ok(LoginResponse.builder()
-                .message("Đăng xuất thành công")
-                .build());
     }
 }

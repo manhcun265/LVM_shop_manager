@@ -6,7 +6,8 @@ import com.shoplvm.productmanagement.dto.response.UserResponse;
 import com.shoplvm.productmanagement.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,6 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
+@Slf4j
 public class UserController {
 
     private final UserService userService;
@@ -25,53 +27,55 @@ public class UserController {
      * Lấy danh sách tất cả người dùng
      */
     @GetMapping
-    public ResponseEntity<List<UserResponse>> getAllUsers() {
-        return ResponseEntity.ok(userService.getAllUsers());
+    @ResponseStatus(HttpStatus.OK)
+    public List<UserResponse> getAllUsers() {
+        log.info("Lấy danh sách tất cả người dùng");
+        return userService.getAllUsers();
     }
 
     /**
      * Lấy thông tin chi tiết người dùng theo ID
      */
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
-        return ResponseEntity.ok(userService.getUserById(id));
+    @ResponseStatus(HttpStatus.OK)
+    public UserResponse getUserById(@PathVariable Long id) {
+        log.info("Lấy thông tin chi tiết người dùng ID={}", id);
+        return userService.getUserById(id);
     }
 
     /**
      * Cập nhật thông tin người dùng
      */
     @PutMapping("/{id}")
-    public ResponseEntity<UserResponse> updateUser(
-            @PathVariable Long id, @Valid @RequestBody UpdateUserRequest dto) {
-       userService.updateUser(id, dto);
-        return ResponseEntity.ok(UserResponse.builder()
-                .message("Cập nhật thông tin người dùng thành công")
-                .id(id)
-                .build());
+    @ResponseStatus(HttpStatus.OK)
+    public UserResponse updateUser(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateUserRequest dto) {
+        log.info("Nhận yêu cầu cập nhật thông tin người dùng ID={}", id);
+        userService.updateUser(id, dto);
+        return userService.getUserById(id);
     }
 
     /**
      * Xóa người dùng
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<UserResponse> deleteUser(@PathVariable Long id) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteUser(@PathVariable Long id) {
+        log.info("Nhận yêu cầu xóa người dùng ID={}", id);
         userService.deleteUser(id);
-        return ResponseEntity.ok(UserResponse.builder()
-                .message("Xóa người dùng thành công")
-                .id(id)
-                .build());
     }
 
     /**
      * Cập nhật vai trò người dùng
      */
     @PutMapping("/{id}/role")
-    public ResponseEntity<UserResponse> updateUserRole(
-            @PathVariable Long id, @Valid @RequestBody UpdateUserRoleRequest request) {
+    @ResponseStatus(HttpStatus.OK)
+    public UserResponse updateUserRole(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateUserRoleRequest request) {
+        log.info("Nhận yêu cầu cập nhật vai trò người dùng ID={} thành {}", id, request.getRole());
         userService.updateUserRole(id, request.getRole());
-        return ResponseEntity.ok(UserResponse.builder()
-                .message("Cập nhật vai trò người dùng thành công")
-                .id(id)
-                .build());
+        return userService.getUserById(id);
     }
 }
